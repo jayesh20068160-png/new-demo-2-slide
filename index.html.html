@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Top Secret: Gudiya's Bday 🎂</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Outfit:wght@300;400;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Canvas Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --bg-main: #ffffff;
+            --text-main: #334155;
+            --accent-pink: #f472b6;
+            --ticket-bg: #f8fafc;
+            --ticket-border: #cbd5e1;
+        }
+        body {
+            margin: 0;
+            background-color: var(--bg-main);
+            font-family: 'Outfit', sans-serif;
+            color: var(--text-main);
+            overflow-x: hidden;
+        }
+        .font-handwriting { font-family: 'Caveat', cursive; }
+        .font-terminal { font-family: 'Space Mono', monospace; }
+        
+        /* Smooth Scrolling & Custom Scrollbar */
+        html { scroll-behavior: smooth; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent-pink); }
+        
+        .screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            z-index: 100; display: flex; flex-direction: column;
+            justify-content: center; align-items: center;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+        
+        /* Screen 1: Hacker / Roast Terminal */
+        #hacker-screen {
+            background-color: #0f172a;
+            color: #22c55e;
+            padding: 20px;
+            align-items: flex-start;
+            justify-content: flex-start;
+        }
+        .terminal-text p {
+            margin-bottom: 8px;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: popIn 0.3s forwards;
+        }
+        @keyframes popIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .btn-glitch {
+            background: transparent; border: 2px solid #22c55e;
+            color: #22c55e; font-family: 'Space Mono', monospace;
+            padding: 10px 20px; cursor: pointer; text-transform: uppercase;
+            font-weight: bold; transition: all 0.2s;
+        }
+        .btn-glitch:hover { background: #22c55e; color: #0f172a; transform: scale(1.05); }
+        
+        /* Cake Screen */
+        #cake-screen {
+            background: radial-gradient(circle at center, #1e293b 0%, #020617 100%);
+            opacity: 0; visibility: hidden;
+        }
+        .cake { position: relative; width: 250px; height: 200px; cursor: pointer; transition: transform 0.3s; }
+        .cake:hover { transform: translateY(-10px); }
+        .layer-bottom { position: absolute; bottom: 0; width: 100%; height: 80px; background: #fbcfe8; border-radius: 10px; border: 4px solid #f472b6; }
+        .layer-top { position: absolute; bottom: 80px; left: 10%; width: 80%; height: 70px; background: #fce7f3; border-radius: 10px; border: 4px solid #f472b6; }
+        .icing { position: absolute; top: -10px; width: 100%; height: 30px; background: #fff; border-radius: 20px; }
+        .drip { position: absolute; width: 20px; height: 40px; background: #fff; border-radius: 20px; }
+        .candle { position: absolute; bottom: 150px; left: 50%; transform: translateX(-50%); width: 16px; height: 50px; background: repeating-linear-gradient(45deg, #fff, #fff 5px, #ef4444 5px, #ef4444 10px); border-radius: 4px; }
+        .flame {
+            position: absolute; bottom: 205px; left: 50%; transform: translateX(-50%);
+            width: 20px; height: 35px; background: #fbbf24; border-radius: 50% 50% 20% 20%;
+            box-shadow: 0 0 15px #fbbf24, 0 0 30px #ea580c;
+            animation: flicker 0.1s infinite alternate; transition: all 0.3s ease;
+        }
+        @keyframes flicker {
+            0% { transform: translateX(-50%) scale(1) skewX(2deg); opacity: 0.9; }
+            100% { transform: translateX(-50%) scale(1.1) skewX(-2deg); opacity: 1; }
+        }
+        .smoke { position: absolute; bottom: 210px; left: 50%; transform: translateX(-50%); width: 10px; height: 10px; background: gray; border-radius: 50%; opacity: 0; filter: blur(4px); }
+        
+        #main-content {
+            opacity: 0; visibility: hidden; transition: opacity 1.5s ease-in;
+        }
+        
+        .bg-pattern {
+            background-color: #ffffff;
+            background-image: radial-gradient(#e2e8f0 2px, transparent 2px);
+            background-size: 30px 30px;
+        }
+        
+        /* Polaroid Memories */
+        .polaroid {
+            background: white; padding: 12px 12px 40px 12px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid #e2e8f0;
+        }
+        .polaroid:hover { transform: scale(1.05) rotate(0deg) !important; z-index: 10; box-shadow: 0 15px 30px rgba(0,0,0,0.15); }
+        .tape {
+            position: absolute; top: -12px; left: 50%; transform: translateX(-50%) rotate(-3deg);
+            width: 100px; height: 30px; background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(5px); border: 1px solid rgba(0,0,0,0.1); z-index: 2;
+        }
+        
+        /* Vouchers */
+        .voucher-card {
+            background-color: var(--ticket-bg);
+            border: 2px dashed var(--ticket-border);
+            border-radius: 12px;
+            position: relative;
+            padding: 24px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.3s;
+            overflow: visible; 
+        }
+        .voucher-card:hover { transform: translateY(-5px); background-color: #f1f5f9; }
+        .voucher-card::before, .voucher-card::after {
+            content: ''; position: absolute; top: 50%; width: 24px; height: 24px;
+            background-color: var(--bg-main); border: 2px dashed var(--ticket-border); border-radius: 50%;
+            transform: translateY(-50%); z-index: 5;
+        }
+        .voucher-card::before { left: -13px; clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%); }
+        .voucher-card::after { right: -13px; clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%); }
+        
+        .voucher-stamp {
+            position: absolute; top: 10px; right: 10px; color: #ff4d6d;
+            font-size: 1.25rem; font-weight: 800; text-transform: uppercase;
+            border: 3px solid #ff4d6d; border-radius: 6px; padding: 4px 12px;
+            transform: rotate(-15deg) scale(1.5); opacity: 0; pointer-events: none;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 10; background: rgba(255,255,255,0.8); backdrop-filter: blur(2px);
+        }
+        .voucher-card.claimed .voucher-stamp { opacity: 1; transform: rotate(-15deg) scale(1); }
+        .voucher-card.claimed { opacity: 0.7; pointer-events: none; border-color: #94a3b8; }
+        
+        /* Letter Box */
+        .roast-letter {
+            background-color: #fefce8;
+            background-image: repeating-linear-gradient(transparent, transparent 29px, #e2e8f0 29px, #e2e8f0 30px);
+            line-height: 30px; padding: 30px 40px 40px 60px;
+            border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.05); position: relative;
+        }
+        .roast-letter::before { content: ''; position: absolute; top: 0; left: 40px; bottom: 0; width: 2px; background-color: #f87171; }
+        
+        /* Animations */
+        .fade-up { opacity: 0; transform: translateY(50px); transition:0.8s all ease-out; }
+        .fade-up.visible { opacity: 1; transform: translateY(0); }
+    </style>
+</head>
+<body class="bg-pattern">
+    <!-- Screen 1: Terminal -->
+    <div id="hacker-screen" class="screen font-terminal">
+        <div class="w-full max-w-3xl mx-auto">
+            <div class="flex justify-between items-center mb-6 border-b border-green-800 pb-2">
+                <span class="text-green-500 font-bold">SYSTEM BOOT_</span>
+                <span class="text-green-700 text-sm">v4.0.4</span>
+            </div>
+            <div id="terminal-content" class="terminal-text text-sm md:text-base space-y-1 mb-8 h-64 overflow-y-auto">
+                <!-- Lines injected by JS -->
+            </div>
+            <div id="action-box" class="hidden mt-8 text-center">
+                <p class="text-yellow-400 mb-4 animate-pulse">WARNING: SUBJECT IDENTIFIED AS 'GUDIYA'. EXTREME DRAMA LEVEL DETECTED.</p>
+                <button id="btn-accept" class="btn-glitch">
+                    I AGREE I AM ANNOYING (Press Enter)
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Screen 2: Cake -->
+    <div id="cake-screen" class="screen">
+        <div class="text-center mb-16 px-4">
+            <h2 class="text-4xl md:text-5xl text-white font-bold mb-4 font-handwriting tracking-wider">Access Granted.</h2>
+            <p class="text-gray-400 text-lg md:text-xl max-w-lg mx-auto">
+                Quick, blow out the candle by tapping it before your teeth fall out from old age! 👵
+            </p>
+        </div>
+        <div class="cake" onclick="blowCandle()">
+            <div class="layer-bottom">
+                <div class="icing"></div>
+                <div class="drip" style="left: 10%; height: 35px;"></div>
+                <div class="drip" style="left: 30%; height: 50px;"></div>
+                <div class="drip" style="left: 60%; height: 30px;"></div>
+                <div class="drip" style="left: 80%; height: 45px;"></div>
+            </div>
+            <div class="layer-top">
+                <div class="icing"></div>
+                <div class="drip" style="left: 20%; height: 30px;"></div>
+                <div class="drip" style="left: 50%; height: 40px;"></div>
+                <div class="drip" style="left: 75%; height: 25px;"></div>
+            </div>
+            <div class="candle"></div>
+            <div class="flame" id="flame"></div>
+            <div class="smoke" id="smoke"></div>
+        </div>
+        <p class="text-pink-400 mt-12 animate-bounce font-medium cursor-pointer" onclick="blowCandle()">[ Tap the flame 🔥 ]</p>
+    </div>
+
+    <!-- Main Site -->
+    <main id="main-content" class="w-full relative pb-20">
+        <!-- Hero Section -->
+        <header class="min-h-screen flex flex-col justify-center items-center text-center px-4 relative pt-10">
+            <div class="fade-up">
+                <span class="bg-gray-100 text-gray-500 px-4 py-1 rounded-full text-sm font-bold uppercase tracking-widest border border-gray-200 shadow-sm inline-block mb-6">
+                    OFFICIALLY OLD
+                </span>
+                <h1 class="text-6xl md:text-8xl font-extrabold text-slate-800 mb-4 tracking-tight">
+                    Happy B'day,<br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-rose-400 font-handwriting text-7xl md:text-9xl">Gudiya!</span>
+                </h1>
+                <p class="text-lg md:text-2xl text-slate-500 mt-6 max-w-2xl mx-auto font-medium">
+                    I was going to buy you an expensive gift, but I realized my presence in your life is the greatest gift of all. You're welcome. 😌
+                </p>
+            </div>
+            <div class="absolute bottom-10 animate-bounce">
+                <p class="text-gray-400 text-sm font-bold uppercase tracking-widest mb-2">Scroll for your reality check</p>
+                <div class="w-6 h-10 border-2 border-gray-300 rounded-full mx-auto flex justify-center pt-2">
+                    <div class="w-1.5 h-3 bg-gray-400 rounded-full"></div>
+                </div>
+            </div>
+        </header>
+
+        <div class="max-w-6xl mx-auto px-4 md:px-8 space-y-32">
+            <section class="fade-up pt-10">
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-3">Cinematic Reality 📸</h2>
+                    <p class="text-slate-500 font-medium text-lg">Proof that you're only normal 10% of the time.</p>
+                </div>
+                
+                <div class="flex flex-col md:flex-row justify-center items-center gap-12 md:gap-8">
+                    <!-- Photo 1 -->
+                    <div class="polaroid w-72 transform -rotate-3 md:-translate-y-4">
+                        <div class="tape"></div>
+                        <img src="photo1.jpg" alt="Funny pic" class="w-full aspect-square object-cover bg-gray-100">
+                        <p class="font-handwriting text-3xl text-center mt-6 text-slate-700">Looking like a potato 🥔</p>
+                    </div>
+                    
+                    <!-- NEW: Image Slideshow Montage -->
+                    <div class="polaroid w-80 transform rotate-2 z-10 scale-105 border-4 border-slate-800 shadow-2xl">
+                        <div class="tape" style="background: rgba(244, 114, 182, 0.5);"></div>
+                        
+                        <!-- Top Bar like a recording screen -->
+                        <div class="bg-slate-800 text-white text-xs font-bold px-2 py-1 flex justify-between items-center">
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 bg-red-500 rounded-full animate-pulse"></span> LIVE MEMORIES</span>
+                            <span>AESTHETIC VIBES</span>
+                        </div>
+                        
+                        <!-- Slideshow Container -->
+                        <div class="relative w-full aspect-square bg-slate-200 overflow-hidden">
+                            <!-- In do images ke beech transition hoga -->
+                            <img id="slide-img-1" src="slide1.jpg" alt="Slide" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000" style="opacity: 1;">
+                            <img id="slide-img-2" src="slide2.jpg" alt="Slide" class="absolute inset-0 w-full h-full object-cover transition-opacity duration-1000" style="opacity: 0;">
+                        </div>
+                        
+                        <p class="font-handwriting text-3xl text-center mt-5 text-pink-500 font-bold">Main Character Energy 💅</p>
+                    </div>
+                    
+                    <!-- Photo 3 -->
+                    <div class="polaroid w-72 transform rotate-6 md:translate-y-8">
+                        <div class="tape"></div>
+                        <img src="photo2.jpg" alt="Weird pic" class="w-full aspect-square object-cover bg-gray-100">
+                        <p class="font-handwriting text-3xl text-center mt-6 text-slate-700">Delusional era ✨</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Vouchers Section -->
+            <section class="fade-up pt-10">
+                <div class="bg-white rounded-3xl p-8 md:p-12 shadow-[0_8px_30px_rgb(0,0,0,0.04)] border border-slate-100">
+                    <div class="text-center mb-12">
+                        <h2 class="text-4xl md:text-5xl font-extrabold text-slate-800 mb-3">Lifetime Vouchers 🎟️</h2>
+                        <p class="text-slate-500 font-medium text-lg">Click to claim. (No refunds, no exchanges, don't misuse them).</p>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                        <div class="voucher-card" onclick="claimVoucher(this)">
+                            <div class="voucher-stamp">CLAIMED</div>
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-12 h-12 rounded-full bg-pink-50 flex items-center justify-center text-2xl">🥟</div>
+                                <h3 class="font-bold text-xl text-slate-800">Free Momo Treat</h3>
+                            </div>
+                            <p class="text-slate-500 text-sm leading-relaxed">Redeemable whenever you crave momos. I will pay, no questions asked. Because you're always hungry.</p>
+                        </div>
+                        
+                        <div class="voucher-card" onclick="claimVoucher(this)">
+                            <div class="voucher-stamp">CLAIMED</div>
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-12 h-12 rounded-full bg-purple-50 flex items-center justify-center text-2xl">🗣️</div>
+                                <h3 class="font-bold text-xl text-slate-800">Midnight Rant Pass</h3>
+                            </div>
+                            <p class="text-slate-500 text-sm leading-relaxed">Call me at 2 AM to rant about anything. I promise to pretend to listen without falling asleep.</p>
+                        </div>
+                        
+                        <div class="voucher-card" onclick="claimVoucher(this)">
+                            <div class="voucher-stamp">CLAIMED</div>
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-2xl">🧘‍♀️</div>
+                                <h3 class="font-bold text-xl text-slate-800">1 Hour Peace Pass</h3>
+                            </div>
+                            <p class="text-slate-500 text-sm leading-relaxed">Use this when you want me to stop bullying/roasting you for exactly 60 minutes. Use it wisely.</p>
+                        </div>
+
+                        <div class="voucher-card" onclick="claimVoucher(this)">
+                            <div class="voucher-stamp">CLAIMED</div>
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-12 h-12 rounded-full bg-yellow-50 flex items-center justify-center text-2xl">🎭</div>
+                                <h3 class="font-bold text-xl text-slate-800">Pity Laugh Pass</h3>
+                            </div>
+                            <p class="text-slate-500 text-sm leading-relaxed">When you tell a terrible joke and nobody laughs, use this. I will give you my best fake laugh to save your dignity.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Letter & Final Video Section -->
+            <section class="fade-up pt-10">
+                <div class="flex flex-col lg:flex-row gap-16 items-center">
+                    <div class="w-full lg:w-1/2 relative transform -rotate-1">
+                        <div class="roast-letter text-slate-700">
+                            <h2 class="text-3xl font-extrabold text-slate-800 mb-6 font-handwriting text-5xl">Okay, real talk...</h2>
+                            <div class="font-handwriting text-3xl font-bold space-y-4 tracking-wide text-slate-700">
+                                <p>Dear Akshara,</p>
+                                <p>Despite the fact that you take 3-5 business days to reply to my texts and eat my brain constantly... you're actually a pretty decent friend.</p>
+                                <p>Thanks for tolerating my lame jokes and being the chaotic energy I didn't know I needed.</p>
+                                <p>Have the best birthday ever, Gudiya. Keep shining, keep eating, and please grow some brain cells this year.</p>
+                                <p class="text-right mt-8 text-4xl text-rose-500 font-black">- Apka Pyaara Dost 🐒</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="w-full lg:w-1/2">
+                        <div class="text-center mb-6">
+                            <h3 class="text-4xl font-extrabold text-slate-800 mb-2">Watch This. Or Else. 🔫</h3>
+                            <p class="text-slate-500">My final words before you get too old to hear.</p>
+                        </div>
+                        <div class="bg-white p-3 pb-6 rounded-xl shadow-xl border border-slate-200 transform rotate-2">
+                            <video controls class="w-full aspect-video rounded-lg bg-slate-900 object-cover" poster="">
+                                <source src="final-video.mp4" type="video/mp4">
+                            </video>
+                            <p class="text-center font-handwriting text-2xl font-bold text-slate-600 mt-4">Happy Birthday! ❤️</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+        
+        <footer class="text-center py-12 mt-20 border-t border-slate-200 fade-up">
+            <p class="font-bold text-slate-400 tracking-wide uppercase text-sm">Coded with 💖 and lots of roasting for Gudiya.</p>
+        </footer>
+    </main>
+
+    <script>
+        // --- 1. Terminal Prank Logic ---
+        const terminalLines = [
+            "[SYSTEM] Initializing Birthday Protocol v4.0...",
+            "[SCAN] Activating Facial Recognition...",
+            "[ERROR] Face not recognized. Too much makeup detected.",
+            "[RETRY] Enhancing image... Subject matched: 'AKSHARA'.",
+            "[SCAN] Searching for active brain cells...",
+            "Loading... [||||||||..........] 30%",
+            "Loading... [||||||||||||||....] 70%",
+            "[ERROR] 404 Brain Not Found.",
+            "[INFO] Checking food database...",
+            "[ALERT] High levels of Momo-cravings detected.",
+            "[STATUS] Age verification complete. You are officially a Grandma 👵.",
+            "[PROMPT] Awaiting user reality-check acceptance..."
+        ];
+        
+        const container = document.getElementById('terminal-content');
+        const actionBox = document.getElementById('action-box');
+        const hackerScreen = document.getElementById('hacker-screen');
+        const cakeScreen = document.getElementById('cake-screen');
+        const mainContent = document.getElementById('main-content');
+        
+        let lineIndex = 0;
+        function typeTerminal() {
+            if (lineIndex < terminalLines.length) {
+                const p = document.createElement('p');
+                if(terminalLines[lineIndex].includes("[ERROR]") || terminalLines[lineIndex].includes("[ALERT]")) {
+                    p.classList.add("text-red-500");
+                }
+                p.innerHTML = `<span class="text-blue-400">></span> ${terminalLines[lineIndex]}`;
+                container.appendChild(p);
+                lineIndex++;
+                container.scrollTop = container.scrollHeight;
+                let delay = Math.random() * 500 + 300;
+                if(lineIndex === 6 || lineIndex === 7) delay = 1200; 
+                setTimeout(typeTerminal, delay);
+            } else {
+                setTimeout(() => { actionBox.classList.remove('hidden'); }, 800);
+            }
+        }
+
+        window.onload = () => {
+            document.body.style.overflow = 'hidden';
+            setTimeout(typeTerminal, 1000);
+        };
+
+        // Transition from Hacker to Cake
+        document.getElementById('btn-accept').addEventListener('click', () => {
+            hackerScreen.style.opacity = '0';
+            setTimeout(() => {
+                hackerScreen.style.display = 'none';
+                cakeScreen.style.visibility = 'visible';
+                cakeScreen.style.opacity = '1';
+            }, 800);
+        });
+
+        // --- 2. Cake & Candle Logic ---
+        function blowCandle() {
+            const flame = document.getElementById('flame');
+            const smoke = document.getElementById('smoke');
+            flame.style.transform = 'translateX(-50%) scale(0)';
+            flame.style.opacity = '0';
+            smoke.style.opacity = '1';
+            smoke.style.animation = 'floatUp 1.5s forwards';
+            
+            setTimeout(() => {
+                cakeScreen.style.opacity = '0';
+                setTimeout(() => {
+                    cakeScreen.style.display = 'none';
+                    revealMainSite();
+                }, 800);
+            }, 1000);
+        }
+
+        const style = document.createElement('style');
+        style.innerHTML = `
+            @keyframes floatUp {
+                0% { transform: translate(-50%, 0) scale(1); opacity: 0.8; }
+                100% { transform: translate(-50%, -80px) scale(3); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // --- 3. Main Site Reveal & Confetti ---
+        function revealMainSite() {
+            mainContent.style.visibility = 'visible';
+            mainContent.style.opacity = '1';
+            document.body.style.overflow = 'auto'; 
+            window.scrollTo(0, 0); 
+            
+            var duration = 4 * 1000;
+            var end = Date.now() + duration;
+            (function frame() {
+                confetti({ particleCount: 5, angle:60, spread: 55, origin: { x: 0 }, colors: ['#f472b6', '#fbcfe8', '#cbd5e1'] });
+                confetti({ particleCount: 5, angle:120, spread: 55, origin: { x: 1 }, colors: ['#f472b6', '#fbcfe8', '#cbd5e1'] });
+                if (Date.now() < end) { requestAnimationFrame(frame); }
+            }());
+            
+            // Start slideshow after site is revealed
+            startSlideshow();
+        }
+
+        // --- 4. Voucher Click Logic ---
+        function claimVoucher(element) {
+            if(!element.classList.contains('claimed')) {
+                element.classList.add('claimed');
+                const rect = element.getBoundingClientRect();
+                const x = (rect.left + rect.width / 2) / window.innerWidth;
+                const y = (rect.top + rect.height / 2) / window.innerHeight;
+                confetti({
+                    particleCount: 30, spread: 70, origin: { x: x, y: y },
+                    colors: ['#ff4d6d', '#f8fafc', '#cbd5e1'], disableForReducedMotion: true
+                });
+            }
+        }
+
+        // --- 5. Image Slideshow Logic (Mast Transition) ---
+        const totalSlides = 20; // BHAIA: Yahan number change kar lena agar pics 20 se kam ya zyada ho
+        let currentSlide = 1;
+        let showingImg1 = true;
+        
+        function startSlideshow() {
+            const img1 = document.getElementById('slide-img-1');
+            const img2 = document.getElementById('slide-img-2');
+            
+            setInterval(() => {
+                currentSlide++;
+                if(currentSlide > totalSlides) currentSlide = 1;
+                
+                const nextSrc = `slide${currentSlide}.jpg`; // Automatically slide1.jpg se slide20.jpg tak change hoga
+                
+                if(showingImg1) {
+                    img2.src = nextSrc;
+                    img2.style.opacity = '1';
+                    img1.style.opacity = '0';
+                } else {
+                    img1.src = nextSrc;
+                    img1.style.opacity = '1';
+                    img2.style.opacity = '0';
+                }
+                showingImg1 = !showingImg1;
+            }, 3000); // Har 3 second mein photo change hogi
+        }
+
+        // --- 6. Scroll Animations ---
+        document.addEventListener("DOMContentLoaded", function() {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) { entry.target.classList.add('visible'); }
+                });
+            }, { threshold: 0.1 });
+            document.querySelectorAll('.fade-up').forEach((el) => { observer.observe(el); });
+        });
+    </script>
+</body>
+</html>
